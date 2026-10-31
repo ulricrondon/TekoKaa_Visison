@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEKO KA’A - Monitoramento Vegetal</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<header class="header">
+    <div class="brand">
+        <div class="logo-box">
+            <img src="{{ url_for('static', filename='img/logo_teko.png') }}" alt="Logo TEKO KA’A">
+        </div>
+
+        <div class="brand-text">
+            <h1>TEKO KA’A</h1>
+            <p>Monitoramento Inteligente da Saúde Vegetal</p>
+        </div>
+    </div>
+
+    <button id="toggleMonitoramento" class="monitor-switch inactive">
+        <span class="switch-track">
+            <span class="switch-knob"></span>
+        </span>
+        <span id="toggleText" class="switch-text">Ativar monitoramento</span>
+    </button>
+</header>
+
+<main id="appShell" class="app-shell">
+    <aside class="sidebar">
+        <button id="sidebarToggle" class="sidebar-toggle" title="Abrir menu">
+            <span class="sidebar-toggle-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 7h16"/>
+                    <path d="M4 12h16"/>
+                    <path d="M4 17h16"/>
+                </svg>
+            </span>
+        </button>
+
+        <nav class="nav-menu">
+            <button class="nav-item active" data-tab="tab-mapa" aria-label="Mapa de Saúde">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 3c4.5 3.2 7 6.5 7 10.2A7 7 0 0 1 5 13.2C5 9.5 7.5 6.2 12 3Z"/>
+                        <path d="M8 15c3-3.8 6.2-6.4 9.5-8.2"/>
+                    </svg>
+                </span>
+                <span class="nav-label">Mapa de Saúde</span>
+            </button>
+
+            <button class="nav-item" data-tab="tab-original" aria-label="Original">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h2.2l1-1.5h4.6l1 1.5h2.2A2.5 2.5 0 0 1 20 7.5v9A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-9Z"/>
+                        <circle cx="12" cy="12" r="3.5"/>
+                    </svg>
+                </span>
+                <span class="nav-label">Original</span>
+            </button>
+
+            <button class="nav-item" data-tab="tab-segmentacao" aria-label="Segmentação">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19.5 3.5C12.5 4 7.5 8 7 15c4.8-.3 9.7-4.6 12.5-11.5Z"/>
+                        <path d="M5 20c2.5-6.5 6.5-10 11-13"/>
+                    </svg>
+                </span>
+                <span class="nav-label">Segmentação</span>
+            </button>
+
+            <button class="nav-item" data-tab="tab-textura" aria-label="Textura">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 7c4-3 8 3 12 0 1.5-1 2.5-1.4 4-1"/>
+                        <path d="M4 12c4-3 8 3 12 0 1.5-1 2.5-1.4 4-1"/>
+                        <path d="M4 17c4-3 8 3 12 0 1.5-1 2.5-1.4 4-1"/>
+                    </svg>
+                </span>
+                <span class="nav-label">Textura</span>
+            </button>
+
+            <button class="nav-item" data-tab="tab-graficos" aria-label="Gráficos">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 19V5"/>
+                        <path d="M4 19h16"/>
+                        <path d="M7 15l3-4 3 2 4-6"/>
+                    </svg>
+                </span>
+                <span class="nav-label">Gráficos</span>
+            </button>
+
+            <button class="nav-item" data-tab="tab-relatorio" aria-label="Relatório">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M7 3h7l4 4v14H7V3Z"/>
+                        <path d="M14 3v5h5"/>
+                        <path d="M10 12h6"/>
+                        <path d="M10 16h6"/>
+                    </svg>
+                </span>
+                <span class="nav-label">Relatório</span>
+            </button>
+
+            <button class="nav-item" data-tab="tab-historico" aria-label="Histórico Geral">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 6h16"/>
+                        <path d="M4 12h16"/>
+                        <path d="M4 18h16"/>
+                        <path d="M8 6v12"/>
+                    </svg>
+                </span>
+                <span class="nav-label">Histórico</span>
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-status">
+                <span class="status-dot-small"></span>
+                <div>
+                    <strong>Sistema online</strong>
+                    <small>Interface operacional</small>
+                </div>
+            </div>
+
+            <div class="mini-brand">
+                <span>TEKO KA’A</span>
+                <small>Visão Computacional Vegetal</small>
+            </div>
+        </div>
+    </aside>
+
+    <section class="content">
+        <div class="page-head">
+            <div>
+                <span id="pageEyebrow" class="eyebrow">Camada principal</span>
+                <h2 id="pageTitle">Mapa de Saúde da Planta</h2>
+                <p id="pageSubtitle">Visualize a saúde vegetal por diferentes camadas de análise.</p>
+            </div>
+
+            <div class="status-chip" id="statusChip">
+                <span class="status-dot-small"></span>
+                <span id="statusChipText">Aguardando</span>
+            </div>
+        </div>
+
+        <section id="tab-mapa" class="tab-panel active">
+            <div class="map-layout">
+                <div class="map-card">
+                    <div class="card-title">
+                        <span class="title-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 3c4.5 3.2 7 6.5 7 10.2A7 7 0 0 1 5 13.2C5 9.5 7.5 6.2 12 3Z"/>
+                                <path d="M8 15c3-3.8 6.2-6.4 9.5-8.2"/>
+                            </svg>
+                        </span>
+                        <span>Mapa de Saúde</span>
+                        <b class="live-pill">Camada principal</b>
+                    </div>
+
+                    <div class="health-map">
+                        <div class="legend">
+                            <strong>Composição Visual</strong>
+                            <div><i style="background: rgb(60, 200, 60)"></i> Verde saudável</div>
+                            <div><i style="background: rgb(255, 220, 0)"></i> Amarelo</div>
+                            <div><i style="background: rgb(170, 95, 35)"></i> Marrom/seco</div>
+                            <div><i style="background: rgb(90, 90, 90)"></i> Escuro/sombra</div>
+                        </div>
+
+                        <img src="/video_segmentado" alt="Mapa de saúde da planta">
+                        <div class="map-overlay"></div>
+                        <div class="map-scan"></div>
+                        <div class="map-badge">Composição por cores</div>
+                        <div class="map-badge right">Mapa demonstrativo</div>
+                    </div>
+                </div>
+
+                <aside class="metrics-column">
+                    <div class="metric-card metric-area">
+                        <div class="metric-head">
+                            <span class="metric-icon leaf"></span>
+                            <span>Área da Planta Detectada</span>
+                        </div>
+                        <strong id="areaVerde">--</strong>
+                        <small>da área total analisada</small>
+                        <span id="trendArea" class="metric-trend neutral">Tendência --</span>
+                        <div class="metric-bar"><i></i></div>
+                    </div>
+
+                    <div class="metric-card metric-exg">
+                        <div class="metric-head">
+                            <span class="metric-icon chart"></span>
+                            <span>ExG Atual</span>
+                        </div>
+                        <strong id="exgAtual">--</strong>
+                        <small>índice de vegetação</small>
+                        <span id="trendExg" class="metric-trend neutral">Tendência --</span>
+                        <div class="metric-bar"><i></i></div>
+                    </div>
+
+                    <div class="metric-card metric-texture">
+                        <div class="metric-head">
+                            <span class="metric-icon texture"></span>
+                            <span>Textura Atual</span>
+                        </div>
+                        <strong id="texturaAtual">--</strong>
+                        <small>irregularidade visual</small>
+                        <span id="trendTextura" class="metric-trend neutral">Tendência --</span>
+                        <div class="metric-bar"><i></i></div>
+                    </div>
+
+                    <div class="summary-card">
+                        <strong>Resumo do Dia</strong>
+                        <div><span>Índice Verde Médio</span><b id="resumoExg">--</b></div>
+                        <div><span>Textura Média</span><b id="resumoTextura">--</b></div>
+                        <div><span>Última leitura</span><b id="resumoHorario">--</b></div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <section id="tab-original" class="tab-panel">
+            <div class="original-layout">
+                <div class="hero-card">
+                    <div class="card-title">
+                        <span class="title-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h2.2l1-1.5h4.6l1 1.5h2.2A2.5 2.5 0 0 1 20 7.5v9A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-9Z"/>
+                                <circle cx="12" cy="12" r="3.5"/>
+                            </svg>
+                        </span>
+                        <span>Visão da Câmera</span>
+                        <b class="live-pill">Imagem original</b>
+                    </div>
+
+                    <div class="hero-media">
+                        <img src="/video_original" alt="Visão da câmera">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-segmentacao" class="tab-panel">
+            <div class="analysis-clean-layout">
+                <div class="analysis-metric-card">
+                    <div class="analysis-metric-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M19.5 3.5C12.5 4 7.5 8 7 15c4.8-.3 9.7-4.6 12.5-11.5Z"/>
+                            <path d="M5 20c2.5-6.5 6.5-10 11-13"/>
+                        </svg>
+                    </div>
+
+                    <div class="analysis-metric-content">
+                        <span>Área da Planta Detectada</span>
+                        <strong id="areaVerdeSegmentacao">--</strong>
+                        <small>Percentual da imagem reconhecido como vegetação.</small>
+                    </div>
+
+                    <div class="analysis-metric-tag">Segmentação</div>
+                </div>
+
+                <div class="chart-card analysis-chart-card">
+                    <div class="card-title">
+                        <span class="title-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M19.5 3.5C12.5 4 7.5 8 7 15c4.8-.3 9.7-4.6 12.5-11.5Z"/>
+                                <path d="M5 20c2.5-6.5 6.5-10 11-13"/>
+                            </svg>
+                        </span>
+                        <span>Histórico da Área da Planta Detectada</span>
+                    </div>
+
+                    <div class="chart-box analysis-chart-box">
+                        <canvas id="graficoAreaSegmentacao"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-textura" class="tab-panel">
+            <div class="analysis-clean-layout">
+                <div class="analysis-metric-card texture-card">
+                    <div class="analysis-metric-icon texture">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M4 7c4-3 8 3 12 0 1.5-1 2.5-1.4 4-1"/>
+                            <path d="M4 12c4-3 8 3 12 0 1.5-1 2.5-1.4 4-1"/>
+                            <path d="M4 17c4-3 8 3 12 0 1.5-1 2.5-1.4 4-1"/>
+                        </svg>
+                    </div>
+
+                    <div class="analysis-metric-content">
+                        <span>Textura Atual</span>
+                        <strong id="texturaAtualTextura">--</strong>
+                        <small>Irregularidade visual calculada na região segmentada.</small>
+                    </div>
+
+                    <div class="analysis-metric-tag texture">Textura</div>
+                </div>
+
+                <div class="chart-card analysis-chart-card">
+                    <div class="card-title">
+                        <span class="title-icon texture">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M4 7c4-3 8 3 12 0 1.5-1 2.5-1.4 4-1"/>
+                                <path d="M4 12c4-3 8 3 12 0 1.5-1 2.5-1.4 4-1"/>
+                                <path d="M4 17c4-3 8 3 12 0 1.5-1 2.5-1.4 4-1"/>
+                            </svg>
+                        </span>
+                        <span>Histórico de Textura</span>
+                    </div>
+
+                    <div class="chart-box analysis-chart-box">
+                        <canvas id="graficoTexturaAba"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-graficos" class="tab-panel">
+            <div class="graphs-layout graphs-layout-two">
+                <div class="chart-card">
+                    <div class="card-title">
+                        <span class="title-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 3c4.5 3.2 7 6.5 7 10.2A7 7 0 0 1 5 13.2C5 9.5 7.5 6.2 12 3Z"/>
+                                <path d="M8 15c3-3.8 6.2-6.4 9.5-8.2"/>
+                            </svg>
+                        </span>
+                        <span>Índice de Saúde da Planta</span>
+                    </div>
+
+                    <div class="chart-box overview-chart-box">
+                        <canvas id="graficoSaudeGrande"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="card-title">
+                        <span class="title-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M4 19V5"/>
+                                <path d="M4 19h16"/>
+                                <path d="M7 15l3-4 3 2 4-6"/>
+                            </svg>
+                        </span>
+                        <span>Histórico do Índice Verde (ExG)</span>
+                    </div>
+
+                    <div class="chart-box overview-chart-box">
+                        <canvas id="graficoExgGrande"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-relatorio" class="tab-panel">
+            <div class="report-layout">
+                <div class="report-main-card">
+                    <div class="report-header">
+                        <div>
+                            <span class="eyebrow">Diagnóstico automático</span>
+                            <h3 id="relatorioStatus">AGUARDANDO — 0%</h3>
+                            <p id="relatorioDiagnostico">Aguardando início do monitoramento para gerar diagnóstico.</p>
+                        </div>
+
+                        <div class="report-score">
+                            <span>Índice de Saúde</span>
+                            <strong id="relatorioIndiceSaude">0%</strong>
+                        </div>
+                    </div>
+
+                    <div class="report-grid">
+                        <div>
+                            <span>Área da Planta</span>
+                            <strong id="relatorioArea">--</strong>
+                        </div>
+                        <div>
+                            <span>ExG</span>
+                            <strong id="relatorioExg">--</strong>
+                        </div>
+                        <div>
+                            <span>Textura</span>
+                            <strong id="relatorioTextura">--</strong>
+                        </div>
+                        <div>
+                            <span>Última leitura</span>
+                            <strong id="relatorioHorario">--</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="report-side-card alerts-card">
+                    <div class="card-title">
+                        <span class="title-icon warning-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 3 2.8 20h18.4L12 3Z"/>
+                                <path d="M12 9v5"/>
+                                <path d="M12 17h.01"/>
+                            </svg>
+                        </span>
+                        <span>Alertas Inteligentes</span>
+                    </div>
+                    <div id="alertasLista" class="alerts-list">
+                        <div class="alert-item ok">Nenhum alerta crítico detectado.</div>
+                    </div>
+                </div>
+
+                <div class="report-side-card recommendation-card">
+                    <div class="card-title">
+                        <span class="title-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 3c4.5 3.2 7 6.5 7 10.2A7 7 0 0 1 5 13.2C5 9.5 7.5 6.2 12 3Z"/>
+                                <path d="M8 15c3-3.8 6.2-6.4 9.5-8.2"/>
+                            </svg>
+                        </span>
+                        <span>Recomendação</span>
+                    </div>
+                    <p id="relatorioRecomendacao">
+                        Mantenha iluminação estável e inicie o monitoramento para obter recomendações.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-historico" class="tab-panel">
+            <div class="history-layout">
+                <div class="history-card">
+                    <div class="history-header">
+                        <div>
+                            <span class="eyebrow">Registro por hora</span>
+                            <h3>Histórico Geral da Planta</h3>
+                            <p>Análises válidas salvas a cada 1 hora. A gravação continua com a página fechada enquanto o servidor e o monitoramento estiverem ativos.</p>
+                        </div>
+
+                        <button id="limparHistorico" class="history-clear-btn">Limpar histórico</button>
+                    </div>
+
+                    <div class="history-table-wrap">
+                        <table class="history-table">
+                            <thead>
+                                <tr>
+                                    <th>Data/Hora</th>
+                                    <th>Índice Saúde</th>
+                                    <th>Área da Planta</th>
+                                    <th>ExG</th>
+                                    <th>Textura</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historicoTabelaBody">
+                                <tr>
+                                    <td colspan="6">Nenhum registro salvo ainda.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="statusPanel" class="status-panel status-waiting">
+            <div class="status-left">
+                <span class="status-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 3c4.5 3.2 7 6.5 7 10.2A7 7 0 0 1 5 13.2C5 9.5 7.5 6.2 12 3Z"/>
+                        <path d="M8 15c3-3.8 6.2-6.4 9.5-8.2"/>
+                    </svg>
+                </span>
+
+                <div>
+                    <span>Status da Planta</span>
+                    <small>Análise visual em tempo real</small>
+                </div>
+            </div>
+
+            <div class="status-main">
+                <span id="statusIndicator" class="status-indicator"></span>
+                <strong id="statusPlanta">AGUARDANDO</strong>
+            </div>
+
+            <div class="status-tip">
+                <strong>Dica</strong>
+                <small>Use boa iluminação e câmera estável.</small>
+            </div>
+        </section>
+    </section>
+</main>
+
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

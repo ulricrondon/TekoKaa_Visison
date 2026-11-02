@@ -8,7 +8,7 @@ import numpy as np
 
 from flask import Flask, Response, jsonify, render_template
 
-from plantcv_processor import processar_com_plantcv
+from agri_vision.pipeline import process_frame
 from database import inicializar_banco, registrar_se_devido, listar_historico, limpar_historico
 
 
@@ -20,7 +20,7 @@ app = Flask(__name__)
 # ===============================
 # CAMERA_SOURCE pode receber:
 # - número inteiro para webcam local: 0, 1, 2...
-# - URL de câmera IP do celular: "http://IP_DO_CELULAR:8080/video"
+# - URL de câmera IP: "http://IP_DO_CELULAR:8080/video"
 #
 # Exemplo webcam local:
 # CAMERA_SOURCE = 1
@@ -266,7 +266,7 @@ def loop_camera():
         frame = cv2.flip(frame, 1)
 
         try:
-            frame_segmentado, metricas = processar_com_plantcv(frame)
+            frame_segmentado, metricas = process_frame(frame)
             resultado = montar_dados_processados(metricas, monitoramento=True, camera_ok=True)
 
         except Exception as erro:

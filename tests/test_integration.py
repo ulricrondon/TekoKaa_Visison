@@ -88,7 +88,7 @@ class PlantCVIntegracaoTest(unittest.TestCase):
         with patch.multiple(app, camera=camera, rodando=True, monitoramento_ativo=True,
                             camera_disponivel=True, sessao_monitoramento=1,
                             dados_atuais=app.criar_dados_padrao(monitoramento=True,camera_ok=True)):
-            with patch.object(app, 'iniciar_camera'), patch.object(app, 'processar_com_plantcv', side_effect=processar):
+            with patch.object(app, 'iniciar_camera'), patch.object(app, 'process_frame', side_effect=processar):
                 app.loop_camera()
             self.assertFalse(app.dados_atuais['monitoramento_ativo'])
             self.assertFalse(app.dados_atuais['analise_valida'])
